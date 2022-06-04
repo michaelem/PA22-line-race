@@ -1,4 +1,5 @@
 export default class Player {
+  name: string;
   positionX: number;
   positionY: number;
   targetY: number;
@@ -8,16 +9,17 @@ export default class Player {
   color: string;
   trail: Point[];
 
-  constructor(color: string, context: CanvasRenderingContext2D) {
+  constructor(name: string, color: string, context: CanvasRenderingContext2D, startY: number) {
+    this.name = name;
     this.speed = 50;
     this.positionX = 200;
-    this.positionY = 200;
-    this.targetY = 200;
+    this.positionY = startY;
+    this.targetY = startY;
     this.movementTimer = 0;
     this.context = context;
     this.color = color;
 
-    this.trail = [{ x: 0, y: 200 }];
+    this.trail = [{ x: 0, y: startY }];
   }
 
   maxedOutMovement(): boolean {
@@ -40,7 +42,7 @@ export default class Player {
     }
   }
 
-  move(dt: number) {
+  update(dt: number) {
     this.trail.push({ x: this.positionX, y: this.positionY });
     this.positionX = this.positionX + this.speed * dt;
 

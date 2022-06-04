@@ -6,9 +6,12 @@ var context: CanvasRenderingContext2D;
 
 // game variables
 var playerOne: Player;
+var playerTwo: Player;
+
 var viewPosition: number;
 var level: Level
 var lost = false;
+var won = false;
 
 // system variables
 var last_tick_t = 0;
@@ -21,12 +24,20 @@ function draw() {
     context.fillRect(0, 0, width, height);
     return;
   }
+
+  if (won) {
+    context.fillStyle = "green";
+    context.fillRect(0, 0, width, height);
+    return;
+  }
+
   context.resetTransform();
   context.clearRect(0, 0, width, height);
   context.fillStyle = "black";
   context.fillRect(0, 0, width, height);
 
   playerOne.draw(viewPosition);
+  playerTwo.draw(viewPosition);
   level.draw(viewPosition);
 }
 
@@ -35,11 +46,29 @@ function update(dt: number) {
     return;
   }
 
-  playerOne.move(dt);
+  if (won) {
+    return;
+  }
+
+  playerOne.update(dt);
+  playerTwo.update(dt);
+
   // Center viewport on player one:
   viewPosition = playerOne.positionX - width / 2;
+
   if (level.collide(playerOne.positionX, playerOne.positionY)) {
     lost = true;
+  }
+  if (level.collide(playerTwo.positionX, playerTwo.positionY)) {
+    lost = true;
+  }
+
+  if (level.finish(playerOne.positionX)) {
+    won = true;
+  }
+
+  if (level.finish(playerTwo.positionX)) {
+    won = true;
   }
 }
 
@@ -74,6 +103,12 @@ function keyDownListner(event: KeyboardEvent) {
     case "ArrowDown":
       playerOne.moveDown();
       break;
+    case "KeyW":
+      playerTwo.moveUp();
+      break;
+    case "KeyS":
+      playerTwo.moveDown();
+      break;
   }
 }
 
@@ -89,7 +124,8 @@ function main() {
   // window.addEventListener("resize", resized);
   // resized();
 
-  playerOne = new Player("orange", context);
+  playerOne = new Player("right player", "orange", context, 190);
+  playerTwo = new Player("left player", "green", context, 210);
   level = new Level(context);
 
   loop(performance.now());

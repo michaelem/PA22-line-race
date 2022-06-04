@@ -1,5 +1,6 @@
 export default class Level {
   context: CanvasRenderingContext2D;
+  end: number = 1200;
   squares: Square[] = [
     { x: 0, y: 0, size: 50 },
     { x: 0, y: 400, size: 50 },
@@ -35,6 +36,10 @@ export default class Level {
       }
     }
     return false;
+  }
+
+  finish(x: number) {
+    return x >= this.end;
   }
 
   draw(viewPosition: number) {
