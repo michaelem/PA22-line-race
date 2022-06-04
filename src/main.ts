@@ -34,7 +34,7 @@ function update(dt: number) {
   if (lost) {
     return;
   }
-  
+
   playerOne.move(dt);
   // Center viewport on player one:
   viewPosition = playerOne.positionX - width / 2;
