@@ -26,13 +26,20 @@ export default class Player {
 
   move(dt: number) {
     this.trail.push({ x: this.positionX, y: this.positionY })
-    console.log(this.trail);
     this.positionX = this.positionX + this.speed * dt;
   }
 
   draw(viewPosition: number) {
     const ctx = this.context;
     ctx.resetTransform();
+
+    this.drawTrail(viewPosition);
+  }
+
+  drawTrail(viewPosition: number) {
+    this.cutTrail(viewPosition);
+
+    const ctx = this.context;
 
     ctx.beginPath();
     ctx.lineWidth = 2;
@@ -44,6 +51,10 @@ export default class Player {
 
     ctx.strokeStyle = this.color;
     ctx.stroke();
+  }
+
+  cutTrail(viewPosition: number){
+    this.trail = this.trail.filter(point => point.x >= viewPosition - 200)
   }
 }
 
