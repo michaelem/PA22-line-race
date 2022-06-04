@@ -1,4 +1,5 @@
 import Player from "./player"
+import Level from "./level"
 
 var canvas: HTMLCanvasElement;
 var context: CanvasRenderingContext2D;
@@ -6,6 +7,8 @@ var context: CanvasRenderingContext2D;
 // game variables
 var playerOne: Player;
 var viewPosition: number;
+var level: Level
+var lost = false;
 
 // system variables
 var last_tick_t = 0;
@@ -13,18 +16,27 @@ var width: number;
 var height: number;
 
 function draw() {
+  if (lost) {
+    context.fillStyle = "red";
+    context.fillRect(0, 0, width, height);
+    return;
+  }
   context.resetTransform();
   context.clearRect(0, 0, width, height);
   context.fillStyle = "black";
   context.fillRect(0, 0, width, height);
 
   playerOne.draw(viewPosition);
+  level.draw(viewPosition);
 }
 
 function update(dt: number) {
   playerOne.move(dt);
   // Center viewport on player one:
   viewPosition = playerOne.positionX - width / 2;
+  if (level.collide(playerOne.positionX, playerOne.positionY)) {
+    lost = true;
+  }
 }
 
 function loop(t_ms: number) {
@@ -74,6 +86,7 @@ function main() {
   // resized();
 
   playerOne = new Player("orange", context);
+  level = new Level(context);
 
   loop(performance.now());
 }

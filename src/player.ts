@@ -6,7 +6,7 @@ export default class Player {
   color: string;
 
   constructor(color: string, context: CanvasRenderingContext2D) {
-    this.speed = 10;
+    this.speed = 50;
     this.positionX = 200;
     this.positionY = 200;
     this.context = context;
