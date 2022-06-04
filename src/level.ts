@@ -7,7 +7,15 @@ export default class Level {
     { x: 200, y: 400, size: 50 },
     { x: 400, y: 0, size: 100 },
     { x: 400, y: 400, size: 100 },
-    { x: 600, y: 200, size: 75 },
+    { x: 600, y: 200, size: 50 },
+    { x: 600, y: 0, size: 100 },
+    { x: 600, y: 400, size: 100 },
+    { x: 700, y: 300, size: 80 },
+    { x: 700, y: 200, size: 80 },
+    { x: 700, y: 100, size: 80 },
+    { x: 900, y: 400, size: 100 },
+    { x: 900, y: 200, size: 100 },
+    { x: 900, y: 0, size: 100 },
   ];
 
   constructor(context: CanvasRenderingContext2D) {
