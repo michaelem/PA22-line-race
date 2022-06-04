@@ -4,6 +4,7 @@ export default class Player {
   speed: number;
   context: CanvasRenderingContext2D;
   color: string;
+  trail: Point[];
 
   constructor(color: string, context: CanvasRenderingContext2D) {
     this.speed = 50;
@@ -11,6 +12,8 @@ export default class Player {
     this.positionY = 200;
     this.context = context;
     this.color = color;
+    
+    this.trail = [{ x: 0, y: 200}];
   }
 
   moveUp() {
@@ -22,6 +25,8 @@ export default class Player {
   }
 
   move(dt: number) {
+    this.trail.push({ x: this.positionX, y: this.positionY })
+    console.log(this.trail);
     this.positionX = this.positionX + this.speed * dt;
   }
 
@@ -31,9 +36,18 @@ export default class Player {
 
     ctx.beginPath();
     ctx.lineWidth = 2;
-    ctx.moveTo(0, this.positionY);
-    ctx.lineTo(this.positionX-viewPosition, this.positionY);
+    ctx.moveTo(this.trail[0].x-viewPosition, this.trail[0].y);
+
+    for (let point of this.trail) {
+      ctx.lineTo(point.x-viewPosition, point.y);
+    }
+
     ctx.strokeStyle = this.color;
     ctx.stroke();
   }
+}
+
+interface Point {
+  x: number,
+  y: number
 }
