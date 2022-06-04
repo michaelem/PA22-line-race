@@ -1,0 +1,16 @@
+{
+  "name": "light-surfers",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc --noEmit & esbuild src/main.ts --bundle --sourcemap --minify --outfile=build/main.js && cp -r src/index.html build && python3 -m http.server -d build",
+    "production": "tsc --noEmit && esbuild src/main.ts --bundle --minify --outfile=build/main.js && cp -r src/index.html build"
+  },
+  "author": "Michael Emhofer",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "esbuild": "^0.14.25",
+    "typescript": "^4.6.4"
+  }
+}
