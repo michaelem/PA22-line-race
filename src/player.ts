@@ -21,14 +21,18 @@ export default class Player {
     this.positionY = this.positionY + 20;
   }
 
-  draw() {
+  move(dt: number) {
+    this.positionX = this.positionX + this.speed * dt;
+  }
+
+  draw(viewPosition: number) {
     const ctx = this.context;
     ctx.resetTransform();
 
     ctx.beginPath();
     ctx.lineWidth = 2;
     ctx.moveTo(0, this.positionY);
-    ctx.lineTo(this.positionX, this.positionY);
+    ctx.lineTo(this.positionX-viewPosition, this.positionY);
     ctx.strokeStyle = this.color;
     ctx.stroke();
   }

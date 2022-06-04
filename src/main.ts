@@ -5,12 +5,12 @@ var context: CanvasRenderingContext2D;
 
 // game variables
 var playerOne: Player;
+var viewPosition: number;
 
 // system variables
 var last_tick_t = 0;
 var width: number;
 var height: number;
-var keyStates: Set<string> = new Set();
 
 function draw() {
   context.resetTransform();
@@ -18,10 +18,13 @@ function draw() {
   context.fillStyle = "black";
   context.fillRect(0, 0, width, height);
 
-  playerOne.draw();
+  playerOne.draw(viewPosition);
 }
 
 function update(dt: number) {
+  playerOne.move(dt);
+  // Center viewport on player one:
+  viewPosition = playerOne.positionX - width / 2;
 }
 
 function loop(t_ms: number) {
@@ -62,6 +65,8 @@ function main() {
   canvas = document.getElementById("canvas") as HTMLCanvasElement;
   width = canvas.width;
   height = canvas.height;
+
+  viewPosition = width / 2;
 
   context = canvas.getContext("2d")!;
   window.addEventListener("keydown", keyDownListner);
