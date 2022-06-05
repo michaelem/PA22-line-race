@@ -71,6 +71,7 @@ function update(dt: number) {
   viewPosition = averagePosition - width / 2;
 
   for (let player of players) {
+    
     if (level.collide(player.positionX, player.positionY)) {
       lost = true;
       looser = player.name;
