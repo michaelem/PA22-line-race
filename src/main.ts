@@ -8,10 +8,14 @@ var context: CanvasRenderingContext2D;
 var playerOne: Player;
 var playerTwo: Player;
 
+var players: Player[];
+
 var viewPosition: number;
 var level: Level
 var lost = false;
+var looser: string;
 var won = false;
+var winner: string;
 
 // system variables
 var last_tick_t = 0;
@@ -22,12 +26,22 @@ function draw() {
   if (lost) {
     context.fillStyle = "red";
     context.fillRect(0, 0, width, height);
+
+    context.font = "30px sans-serif";
+    context.textAlign = 'center';
+    context.fillStyle = "black";
+    context.fillText(`🙈 ${looser} lost`, 200, 200)
     return;
   }
 
   if (won) {
     context.fillStyle = "green";
     context.fillRect(0, 0, width, height);
+
+    context.font = "30px sans-serif";
+    context.textAlign = 'center';
+    context.fillStyle = "black";
+    context.fillText(`🚀 ${winner} won`, 200, 200)
     return;
   }
 
@@ -36,8 +50,9 @@ function draw() {
   context.fillStyle = "black";
   context.fillRect(0, 0, width, height);
 
-  playerOne.draw(viewPosition);
-  playerTwo.draw(viewPosition);
+  for (let player of players) {
+    player.draw(viewPosition);
+  }
   level.draw(viewPosition);
 }
 
@@ -50,25 +65,25 @@ function update(dt: number) {
     return;
   }
 
-  playerOne.update(dt);
-  playerTwo.update(dt);
+  for (let player of players) {
+    player.update(dt);
+  }
 
   // Center viewport on player one:
-  viewPosition = playerOne.positionX - width / 2;
+  viewPosition = players[0].positionX - width / 2;
 
-  if (level.collide(playerOne.positionX, playerOne.positionY)) {
-    lost = true;
-  }
-  if (level.collide(playerTwo.positionX, playerTwo.positionY)) {
-    lost = true;
-  }
-
-  if (level.finish(playerOne.positionX)) {
-    won = true;
+  for (let player of players) {
+    if (level.collide(player.positionX, player.positionY)) {
+      lost = true;
+      looser = player.name;
+    }
   }
 
-  if (level.finish(playerTwo.positionX)) {
-    won = true;
+  for (let player of players) {
+    if (level.finish(player.positionX)) {
+      won = true;
+      winner = player.name;   
+    }
   }
 }
 
@@ -96,19 +111,13 @@ function resized() {
 }
 
 function keyDownListner(event: KeyboardEvent) {
-  switch(event.code) {
-    case "ArrowUp":
-      playerOne.moveUp();
-      break;
-    case "ArrowDown":
-      playerOne.moveDown();
-      break;
-    case "KeyW":
-      playerTwo.moveUp();
-      break;
-    case "KeyS":
-      playerTwo.moveDown();
-      break;
+  for (let player of players) {
+    if (event.code == player.upKeyCode) {
+      player.moveUp();
+    }
+    if (event.code == player.downKeyCode) {
+      player.moveDown();
+    }
   }
 }
 
@@ -124,8 +133,11 @@ function main() {
   // window.addEventListener("resize", resized);
   // resized();
 
-  playerOne = new Player("right player", "orange", context, 190);
-  playerTwo = new Player("left player", "green", context, 210);
+
+  players = [
+    new Player("right player", "orange", context, 190, "ArrowUp", "ArrowDown"),
+    new Player("left player", "green", context, 210, "KeyW", "KeyS")
+  ]
   level = new Level(context);
 
   loop(performance.now());
