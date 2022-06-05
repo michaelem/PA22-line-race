@@ -27,7 +27,6 @@ export default class Player {
   }
 
   maxedOutMovement(): boolean {
-    console.log(`target: ${this.targetY} position: ${this.positionY}`);
     // return Math.abs(this.targetY - this.positionY) >= 1;
     return this.movementTimer > 0;
   }
@@ -52,7 +51,7 @@ export default class Player {
     let speed: number;
 
     if (Math.abs(this.targetY - this.positionY) > 0) {
-      speed = (this.speed - 10) * (Math.cos(this.movementTimer/0.25 * Math.PI) + 1)
+      speed = (this.speed - 30) * (Math.cos(this.movementTimer/0.25 * Math.PI) + 1)
 
       if (this.targetY - this.positionY > 0) { 
         this.positionY = Math.min(this.targetY, this.positionY + speed * dt)
@@ -66,7 +65,6 @@ export default class Player {
     this.positionX = this.positionX + speed * dt;
 
     if (this.movementTimer > 0) {
-      console.log(Math.cos(this.movementTimer/0.25))
       this.movementTimer = this.movementTimer - dt;
     }
   }

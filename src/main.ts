@@ -5,9 +5,6 @@ var canvas: HTMLCanvasElement;
 var context: CanvasRenderingContext2D;
 
 // game variables
-var playerOne: Player;
-var playerTwo: Player;
-
 var players: Player[];
 
 var viewPosition: number;
@@ -69,8 +66,9 @@ function update(dt: number) {
     player.update(dt);
   }
 
-  // Center viewport on player one:
-  viewPosition = players[0].positionX - width / 2;
+  // Center viewport on average player position:
+  const averagePosition = players.reduce((total, next) => total + next.positionX, 0) / players.length;
+  viewPosition = averagePosition - width / 2;
 
   for (let player of players) {
     if (level.collide(player.positionX, player.positionY)) {
