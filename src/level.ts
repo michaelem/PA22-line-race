@@ -1,3 +1,5 @@
+import { DrawScale } from "./drawing";
+
 export default class Level {
   context: CanvasRenderingContext2D;
   end: number = 4300;
@@ -68,44 +70,83 @@ export default class Level {
     return x >= this.end;
   }
 
-  draw(viewPosition: number) {
+  draw(viewPosition: number, drawScale: DrawScale) {
     const ctx = this.context;
+    ctx.lineWidth = 2 * drawScale.yScale;
     for (let square of this.squares) {
       const x = square.x - square.size / 2 - viewPosition;
       const y = square.y - square.size / 2;
       ctx.strokeStyle = "white";
-      ctx.strokeRect(x, y, square.size, square.size);
+      ctx.strokeRect(
+        x * drawScale.xScale,
+        y * drawScale.yScale,
+        square.size * drawScale.xScale,
+        square.size * drawScale.yScale
+      );
     }
 
     if (viewPosition < 2500) {
-      ctx.font = "30px sans-serif";
+      ctx.font = `${30 * drawScale.yScale}px sans-serif`;
       ctx.textAlign = "left";
 
       ctx.fillStyle = "green";
-      ctx.fillText("Left is green", 400 - viewPosition, 300);
-      ctx.fillText("Use 'w' and 's' to move", 800 - viewPosition, 300);
+      ctx.fillText(
+        "Left is green",
+        (400 - viewPosition) * drawScale.xScale,
+        300 * drawScale.yScale
+      );
+      ctx.fillText(
+        "Use 'w' and 's' to move",
+        (800 - viewPosition) * drawScale.xScale,
+        300 * drawScale.yScale
+      );
 
       ctx.fillStyle = "orange";
-      ctx.fillText("Right is orange", 400 - viewPosition, 130);
-      ctx.fillText("Use 'up' and 'down' to move", 800 - viewPosition, 130);
+      ctx.fillText(
+        "Right is orange",
+        (400 - viewPosition) * drawScale.xScale,
+        130 * drawScale.yScale
+      );
+      ctx.fillText(
+        "Use 'up' and 'down' to move",
+        (800 - viewPosition) * drawScale.xScale,
+        130 * drawScale.yScale
+      );
 
       ctx.fillStyle = "grey";
-      ctx.fillText(`avoid the squares =>`, 1300 - viewPosition, 210);
+      ctx.fillText(
+        `avoid the squares =>`,
+        (1300 - viewPosition) * drawScale.xScale,
+        210 * drawScale.yScale
+      );
 
       ctx.fillStyle = "grey";
-      ctx.fillText(`get to finish first!`, 1900 - viewPosition, 210);
+      ctx.fillText(
+        `get to finish first!`,
+        (1900 - viewPosition) * drawScale.xScale,
+        210 * drawScale.yScale
+      );
 
       ctx.beginPath();
-      ctx.moveTo(2400 - viewPosition, 50);
-      ctx.lineTo(2400 - viewPosition, 350);
+      ctx.moveTo(
+        (2400 - viewPosition) * drawScale.xScale,
+        50 * drawScale.yScale
+      );
+      ctx.lineTo(
+        (2400 - viewPosition) * drawScale.xScale,
+        350 * drawScale.yScale
+      );
       ctx.strokeStyle = "grey";
-      ctx.stroke()
+      ctx.stroke();
     }
     ctx.beginPath();
-    ctx.moveTo(4300 - viewPosition, 0);
-    ctx.lineTo(4300 - viewPosition, 400);
+    ctx.moveTo((4300 - viewPosition) * drawScale.xScale, 0 * drawScale.yScale);
+    ctx.lineTo(
+      (4300 - viewPosition) * drawScale.xScale,
+      400 * drawScale.yScale
+    );
     ctx.strokeStyle = "grey";
-    ctx.stroke()
+    ctx.stroke();
   }
 }
 

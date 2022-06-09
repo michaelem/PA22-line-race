@@ -1,5 +1,6 @@
-import Player from "./player"
-import Level from "./level"
+import Player from "./player";
+import Level from "./level";
+import { Point, DrawScale } from "./drawing";
 
 var canvas: HTMLCanvasElement;
 var context: CanvasRenderingContext2D;
@@ -8,7 +9,7 @@ var context: CanvasRenderingContext2D;
 var players: Player[];
 
 var viewPosition: number;
-var level: Level
+var level: Level;
 var lost = false;
 var looser: string;
 var won = false;
@@ -19,15 +20,25 @@ var last_tick_t = 0;
 var width: number;
 var height: number;
 
+function drawScale(): DrawScale {
+  return { xScale: width / 400, yScale: height / 400 };
+}
+
 function draw() {
+  context.resetTransform();
+
   if (lost) {
     context.fillStyle = "red";
     context.fillRect(0, 0, width, height);
 
-    context.font = "30px sans-serif";
-    context.textAlign = 'center';
+    context.font = `${30 * drawScale().yScale}px sans-serif`;
+    context.textAlign = "center";
     context.fillStyle = "black";
-    context.fillText(`🙈 ${looser} lost`, 200, 200)
+    context.fillText(
+      `🙈 ${looser} lost`,
+      200 * drawScale().xScale,
+      200 * drawScale().yScale
+    );
     return;
   }
 
@@ -35,22 +46,25 @@ function draw() {
     context.fillStyle = "green";
     context.fillRect(0, 0, width, height);
 
-    context.font = "30px sans-serif";
-    context.textAlign = 'center';
+    context.font = `${30 * drawScale().yScale}px sans-serif`;
+    context.textAlign = "center";
     context.fillStyle = "black";
-    context.fillText(`🚀 ${winner} won`, 200, 200)
+    context.fillText(
+      `🚀 ${winner} won`,
+      200 * drawScale().xScale,
+      200 * drawScale().yScale
+    );
     return;
   }
 
-  context.resetTransform();
   context.clearRect(0, 0, width, height);
   context.fillStyle = "black";
   context.fillRect(0, 0, width, height);
 
   for (let player of players) {
-    player.draw(viewPosition);
+    player.draw(viewPosition, drawScale());
   }
-  level.draw(viewPosition);
+  level.draw(viewPosition, drawScale());
 }
 
 function update(dt: number) {
@@ -67,11 +81,11 @@ function update(dt: number) {
   }
 
   // Center viewport on average player position:
-  const averagePosition = players.reduce((total, next) => total + next.positionX, 0) / players.length;
-  viewPosition = averagePosition - width / 2;
+  const averagePosition =
+    players.reduce((total, next) => total + next.positionX, 0) / players.length;
+  viewPosition = averagePosition - 200;
 
   for (let player of players) {
-    
     if (level.collide(player.positionX, player.positionY)) {
       lost = true;
       looser = player.name;
@@ -81,7 +95,7 @@ function update(dt: number) {
   for (let player of players) {
     if (level.finish(player.positionX)) {
       won = true;
-      winner = player.name;   
+      winner = player.name;
     }
   }
 }
@@ -98,15 +112,18 @@ function loop(t_ms: number) {
 }
 
 function resized() {
-  width = window.innerWidth;
-  height = window.innerHeight;
-  if (width > height) {
-    canvas.width = height;
-    canvas.height = height;
+  const wWidth = window.innerWidth;
+  const wHeight = window.innerHeight;
+  console.log(width, height);
+  if (wWidth > wHeight) {
+    width = wHeight;
+    height = wHeight;
   } else {
-    canvas.width = width;
-    canvas.height = width;
+    width = wWidth;
+    height = wWidth;
   }
+  canvas.width = width;
+  canvas.height = height;
 }
 
 function keyDownListner(event: KeyboardEvent) {
@@ -125,18 +142,17 @@ function main() {
   width = canvas.width;
   height = canvas.height;
 
-  viewPosition = width / 2;
+  viewPosition = 200;
 
   context = canvas.getContext("2d")!;
   window.addEventListener("keydown", keyDownListner);
-  // window.addEventListener("resize", resized);
-  // resized();
-
+  window.addEventListener("resize", resized);
+  resized();
 
   players = [
     new Player("right player", "orange", context, 190, "ArrowUp", "ArrowDown"),
-    new Player("left player", "green", context, 210, "KeyW", "KeyS")
-  ]
+    new Player("left player", "green", context, 210, "KeyW", "KeyS"),
+  ];
   level = new Level(context);
 
   loop(performance.now());

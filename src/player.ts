@@ -1,3 +1,4 @@
+import { Point, DrawScale } from "./drawing";
 export default class Player {
   name: string;
   positionX: number;
@@ -11,7 +12,14 @@ export default class Player {
   upKeyCode: string;
   downKeyCode: string;
 
-  constructor(name: string, color: string, context: CanvasRenderingContext2D, startY: number, upKeyCode: string, downKeyCode: string) {
+  constructor(
+    name: string,
+    color: string,
+    context: CanvasRenderingContext2D,
+    startY: number,
+    upKeyCode: string,
+    downKeyCode: string
+  ) {
     this.name = name;
     this.speed = 50;
     this.positionX = 200;
@@ -51,12 +59,14 @@ export default class Player {
     let speed: number;
 
     if (Math.abs(this.targetY - this.positionY) > 0) {
-      speed = (this.speed - 30) * (Math.cos(this.movementTimer/0.25 * Math.PI) + 1)
+      speed =
+        (this.speed - 30) *
+        (Math.cos((this.movementTimer / 0.25) * Math.PI) + 1);
 
-      if (this.targetY - this.positionY > 0) { 
-        this.positionY = Math.min(this.targetY, this.positionY + speed * dt)
+      if (this.targetY - this.positionY > 0) {
+        this.positionY = Math.min(this.targetY, this.positionY + speed * dt);
       } else {
-        this.positionY = Math.max(this.targetY, this.positionY - speed * dt)
+        this.positionY = Math.max(this.targetY, this.positionY - speed * dt);
       }
     } else {
       speed = this.speed;
@@ -69,24 +79,30 @@ export default class Player {
     }
   }
 
-  draw(viewPosition: number) {
+  draw(viewPosition: number, drawScale: DrawScale) {
     const ctx = this.context;
     ctx.resetTransform();
 
-    this.drawTrail(viewPosition);
+    this.drawTrail(viewPosition, drawScale);
   }
 
-  drawTrail(viewPosition: number) {
+  drawTrail(viewPosition: number, drawScale: DrawScale) {
     this.cutTrail(viewPosition);
 
     const ctx = this.context;
 
     ctx.beginPath();
-    ctx.lineWidth = 2;
-    ctx.moveTo(this.trail[0].x - viewPosition, this.trail[0].y);
+    ctx.lineWidth = 2 * drawScale.yScale;
+    ctx.moveTo(
+      (this.trail[0].x - viewPosition) * drawScale.xScale,
+      this.trail[0].y * drawScale.yScale
+    );
 
     for (let point of this.trail) {
-      ctx.lineTo(point.x - viewPosition, Math.round(point.y));
+      ctx.lineTo(
+        (point.x - viewPosition) * drawScale.xScale,
+        point.y * drawScale.yScale
+      );
     }
 
     ctx.strokeStyle = this.color;
@@ -96,9 +112,4 @@ export default class Player {
   cutTrail(viewPosition: number) {
     this.trail = this.trail.filter((point) => point.x >= viewPosition - 200);
   }
-}
-
-interface Point {
-  x: number;
-  y: number;
 }
