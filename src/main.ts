@@ -41,6 +41,13 @@ function draw() {
       200 * drawScale().xScale,
       200 * drawScale().yScale
     );
+
+    context.font = `${20 * drawScale().yScale}px sans-serif`;
+    context.fillText(
+      "press 'r' to restart",
+      200 * drawScale().xScale,
+      230 * drawScale().yScale
+    );
     return;
   }
 
@@ -55,6 +62,13 @@ function draw() {
       `🚀 ${winner} won`,
       200 * drawScale().xScale,
       200 * drawScale().yScale
+    );
+
+    context.font = `${20 * drawScale().yScale}px sans-serif`;
+    context.fillText(
+      "press 'r' to restart",
+      200 * drawScale().xScale,
+      230 * drawScale().yScale
     );
     return;
   }
@@ -148,10 +162,10 @@ function resized() {
 }
 
 function keyDownListner(event: KeyboardEvent) {
-  console.log(event.code)
-  if (event.code == "Space") {
+  if (event.code == "Space" && !(lost || won)) {
     paused = !paused;
   }
+
   for (let player of players) {
     if (event.code == player.upKeyCode) {
       player.moveUp();
@@ -159,6 +173,15 @@ function keyDownListner(event: KeyboardEvent) {
     if (event.code == player.downKeyCode) {
       player.moveDown();
     }
+  }
+  if (event.code == "KeyR" && (lost || won)) {
+    players = Player.createPlayers(context);
+
+    for (let player of players) {
+      player.positionX = level.startLine
+    }
+    won = false
+    lost = false
   }
 }
 
@@ -174,10 +197,7 @@ function main() {
   window.addEventListener("resize", resized);
   resized();
 
-  players = [
-    new Player("right player", "orange", context, 190, "ArrowUp", "ArrowDown"),
-    new Player("left player", "green", context, 210, "KeyW", "KeyS"),
-  ];
+  players = Player.createPlayers(context);
   level = new Level(context);
 
   loop(performance.now());

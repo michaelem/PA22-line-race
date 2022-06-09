@@ -34,6 +34,13 @@ export default class Player {
     this.trail = [{ x: 0, y: startY }];
   }
 
+  static createPlayers(context: CanvasRenderingContext2D) {
+    return [
+      new Player("right player", "orange", context, 190, "ArrowUp", "ArrowDown"),
+      new Player("left player", "green", context, 210, "KeyW", "KeyS"),
+    ]
+  }
+
   maxedOutMovement(): boolean {
     // return Math.abs(this.targetY - this.positionY) >= 1;
     return this.movementTimer > 0;

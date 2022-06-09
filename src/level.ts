@@ -1,7 +1,9 @@
 import { DrawScale } from "./drawing";
 
+
 export default class Level {
   context: CanvasRenderingContext2D;
+  startLine: number = 2400;
   end: number = 4300;
   squares: Square[] = [
     { x: 0, y: 0, size: 50 },
@@ -129,11 +131,11 @@ export default class Level {
 
       ctx.beginPath();
       ctx.moveTo(
-        (2400 - viewPosition) * drawScale.xScale,
+        (this.startLine - viewPosition) * drawScale.xScale,
         50 * drawScale.yScale
       );
       ctx.lineTo(
-        (2400 - viewPosition) * drawScale.xScale,
+        (this.startLine - viewPosition) * drawScale.xScale,
         350 * drawScale.yScale
       );
       ctx.strokeStyle = "grey";
