@@ -8,6 +8,8 @@ var context: CanvasRenderingContext2D;
 // game variables
 var players: Player[];
 
+var paused: boolean = false;
+
 var viewPosition: number;
 var level: Level;
 var lost = false;
@@ -65,9 +67,28 @@ function draw() {
     player.draw(viewPosition, drawScale());
   }
   level.draw(viewPosition, drawScale());
+
+  if (paused) {
+    context.fillStyle = "rgba(20,20,20,0.8)";
+    context.fillRect(0, 0, width, height);
+
+    context.globalAlpha = 2.0;
+
+    context.font = `${30 * drawScale().yScale}px sans-serif`;
+    context.textAlign = "center";
+    context.fillStyle = "white";
+    context.fillText(
+      `paused`,
+      200 * drawScale().xScale,
+      200 * drawScale().yScale
+    );
+  }
 }
 
 function update(dt: number) {
+  if (paused) {
+    return;
+  }
   if (lost) {
     return;
   }
@@ -127,6 +148,10 @@ function resized() {
 }
 
 function keyDownListner(event: KeyboardEvent) {
+  console.log(event.code)
+  if (event.code == "Space") {
+    paused = !paused;
+  }
   for (let player of players) {
     if (event.code == player.upKeyCode) {
       player.moveUp();
