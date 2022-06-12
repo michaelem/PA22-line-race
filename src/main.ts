@@ -1,75 +1,44 @@
 import Player from "./player";
 import Level from "./level";
+import EndScreen from "./end-screen";
+import PauseOverlay from "./pause-overlay";
 import { Point, DrawScale } from "./drawing";
 
-var canvas: HTMLCanvasElement;
-var context: CanvasRenderingContext2D;
+enum State {
+  'running',
+  'paused',
+  'lost',
+  'won'
+}
 
 // game variables
 var players: Player[];
-
-var paused: boolean = false;
-
 var viewPosition: number;
 var level: Level;
-var lost = false;
+
+var state: State = State.running;
 var looser: string;
-var won = false;
 var winner: string;
+var endScreen: EndScreen;
 
 // system variables
+var canvas: HTMLCanvasElement;
+var context: CanvasRenderingContext2D;
 var last_tick_t = 0;
 var width: number;
 var height: number;
-
-function drawScale(): DrawScale {
-  return { xScale: width / 400, yScale: height / 400 };
-}
+var drawScale: DrawScale;
 
 function draw() {
   context.resetTransform();
 
-  if (lost) {
-    context.fillStyle = "red";
-    context.fillRect(0, 0, width, height);
-
-    context.font = `${30 * drawScale().yScale}px sans-serif`;
-    context.textAlign = "center";
-    context.fillStyle = "black";
-    context.fillText(
-      `🙈 ${looser} lost`,
-      200 * drawScale().xScale,
-      200 * drawScale().yScale
-    );
-
-    context.font = `${20 * drawScale().yScale}px sans-serif`;
-    context.fillText(
-      "press 'r' to restart",
-      200 * drawScale().xScale,
-      230 * drawScale().yScale
-    );
+  if (state == State.lost) {
+    endScreen.draw(`🙈 ${looser} lost`, "red", drawScale);
     return;
   }
 
-  if (won) {
-    context.fillStyle = "green";
-    context.fillRect(0, 0, width, height);
-
-    context.font = `${30 * drawScale().yScale}px sans-serif`;
-    context.textAlign = "center";
-    context.fillStyle = "black";
-    context.fillText(
-      `🚀 ${winner} won`,
-      200 * drawScale().xScale,
-      200 * drawScale().yScale
-    );
-
-    context.font = `${20 * drawScale().yScale}px sans-serif`;
-    context.fillText(
-      "press 'r' to restart",
-      200 * drawScale().xScale,
-      230 * drawScale().yScale
-    );
+  if (state == State.won) {
+    endScreen.draw(`🚀 ${winner} won`, "green", drawScale);
     return;
   }
 
@@ -78,36 +47,18 @@ function draw() {
   context.fillRect(0, 0, width, height);
 
   for (let player of players) {
-    player.draw(viewPosition, drawScale());
+    player.draw(viewPosition, drawScale);
   }
-  level.draw(viewPosition, drawScale());
+  level.draw(viewPosition, drawScale);
 
-  if (paused) {
-    context.fillStyle = "rgba(20,20,20,0.8)";
-    context.fillRect(0, 0, width, height);
-
-    context.globalAlpha = 2.0;
-
-    context.font = `${30 * drawScale().yScale}px sans-serif`;
-    context.textAlign = "center";
-    context.fillStyle = "white";
-    context.fillText(
-      `paused`,
-      200 * drawScale().xScale,
-      200 * drawScale().yScale
-    );
+  if (state == State.paused) {
+    const overlay = new PauseOverlay(context);
+    overlay.draw(drawScale);
   }
 }
 
 function update(dt: number) {
-  if (paused) {
-    return;
-  }
-  if (lost) {
-    return;
-  }
-
-  if (won) {
+  if (state == State.won || state == State.lost || state == State.paused) {
     return;
   }
 
@@ -122,14 +73,14 @@ function update(dt: number) {
 
   for (let player of players) {
     if (level.collide(player.positionX, player.positionY)) {
-      lost = true;
+      state = State.lost;
       looser = player.name;
     }
   }
 
   for (let player of players) {
     if (level.finish(player.positionX)) {
-      won = true;
+      state = State.won;
       winner = player.name;
     }
   }
@@ -149,7 +100,6 @@ function loop(t_ms: number) {
 function resized() {
   const wWidth = window.innerWidth;
   const wHeight = window.innerHeight;
-  console.log(width, height);
   if (wWidth > wHeight) {
     width = wHeight;
     height = wHeight;
@@ -159,11 +109,17 @@ function resized() {
   }
   canvas.width = width;
   canvas.height = height;
+
+  drawScale = { xScale: width / 400, yScale: height / 400 };
 }
 
 function keyDownListner(event: KeyboardEvent) {
-  if (event.code == "Space" && !(lost || won)) {
-    paused = !paused;
+  if (event.code == "Space") {
+    if (state == State.running) {
+      state = State.paused;
+    } else {
+      state = State.running
+    }
   }
 
   for (let player of players) {
@@ -174,14 +130,13 @@ function keyDownListner(event: KeyboardEvent) {
       player.moveDown();
     }
   }
-  if (event.code == "KeyR" && (lost || won)) {
+  if (event.code == "KeyR" && (state == State.won || state == State.lost)) {
     players = Player.createPlayers(context);
 
     for (let player of players) {
-      player.positionX = level.startLine
+      player.positionX = level.startLine;
     }
-    won = false
-    lost = false
+    state = State.running
   }
 }
 
@@ -199,6 +154,7 @@ function main() {
 
   players = Player.createPlayers(context);
   level = new Level(context);
+  endScreen = new EndScreen(context);
 
   loop(performance.now());
 }
