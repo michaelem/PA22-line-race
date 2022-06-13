@@ -19,6 +19,7 @@ var viewPosition: number;
 var level: Level;
 
 var state: State = State.menu;
+var lastGameMode: string = "start-1-p";
 var looser: string;
 var winner: string;
 var endScreen: EndScreen;
@@ -54,10 +55,10 @@ function draw() {
   context.fillStyle = "black";
   context.fillRect(0, 0, width, height);
 
+  level.draw(viewPosition, drawScale);
   for (let player of players) {
     player.draw(viewPosition, drawScale);
   }
-  level.draw(viewPosition, drawScale);
 
   if (state == State.paused) {
     const overlay = new PauseOverlay(context);
@@ -123,8 +124,8 @@ function resized() {
 
 function keyDownListner(event: KeyboardEvent) {
   if (state == State.menu) {
-    const result = menuScreen.handleKey(event.code);
-    switch (result) {
+    lastGameMode = menuScreen.handleKey(event.code);
+    switch (lastGameMode) {
       case "start-1-p": {
         players = Player.createPlayer(context);
         state = State.running;
@@ -155,8 +156,18 @@ function keyDownListner(event: KeyboardEvent) {
       player.moveDown();
     }
   }
+
   if (event.code == "KeyR" && (state == State.won || state == State.lost)) {
-    players = Player.createPlayers(context);
+    switch (lastGameMode) {
+      case "start-1-p": {
+        players = Player.createPlayer(context);
+        break;
+      }
+      case "start-2-p": {
+        players = Player.createPlayers(context);
+        break;
+      }
+    }
 
     for (let player of players) {
       player.positionX = level.startLine;
