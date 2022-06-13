@@ -85,9 +85,7 @@ function update(dt: number) {
       state = State.lost;
       looser = player.name;
     }
-  }
 
-  for (let player of players) {
     if (level.finish(player.positionX)) {
       state = State.won;
       winner = player.name;
