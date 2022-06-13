@@ -34,6 +34,12 @@ export default class Player {
     this.trail = [{ x: 0, y: startY }];
   }
 
+  static createPlayer(context: CanvasRenderingContext2D) {
+    return [
+      new Player("right player", "orange", context, 200, "ArrowUp", "ArrowDown")
+    ]
+  }
+
   static createPlayers(context: CanvasRenderingContext2D) {
     return [
       new Player("right player", "orange", context, 190, "ArrowUp", "ArrowDown"),

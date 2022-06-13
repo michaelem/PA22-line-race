@@ -2,13 +2,15 @@ import Player from "./player";
 import Level from "./level";
 import EndScreen from "./end-screen";
 import PauseOverlay from "./pause-overlay";
+import MenuScreen from "./menu-screen";
 import { Point, DrawScale } from "./drawing";
 
 enum State {
-  'running',
-  'paused',
-  'lost',
-  'won'
+  "menu",
+  "running",
+  "paused",
+  "lost",
+  "won",
 }
 
 // game variables
@@ -16,10 +18,11 @@ var players: Player[];
 var viewPosition: number;
 var level: Level;
 
-var state: State = State.running;
+var state: State = State.menu;
 var looser: string;
 var winner: string;
 var endScreen: EndScreen;
+var menuScreen: MenuScreen;
 
 // system variables
 var canvas: HTMLCanvasElement;
@@ -31,6 +34,11 @@ var drawScale: DrawScale;
 
 function draw() {
   context.resetTransform();
+
+  if (state == State.menu) {
+    menuScreen.draw(drawScale);
+    return;
+  }
 
   if (state == State.lost) {
     endScreen.draw(`🙈 ${looser} lost`, "red", drawScale);
@@ -58,7 +66,7 @@ function draw() {
 }
 
 function update(dt: number) {
-  if (state == State.won || state == State.lost || state == State.paused) {
+  if (state != State.running) {
     return;
   }
 
@@ -114,11 +122,28 @@ function resized() {
 }
 
 function keyDownListner(event: KeyboardEvent) {
+  if (state == State.menu) {
+    const result = menuScreen.handleKey(event.code);
+    switch (result) {
+      case "start-1-p": {
+        players = Player.createPlayer(context);
+        state = State.running;
+        break;
+      }
+      case "start-2-p": {
+        players = Player.createPlayers(context);
+        state = State.running;
+        break;
+      }
+    }
+    return;
+  }
+
   if (event.code == "Space") {
     if (state == State.running) {
       state = State.paused;
     } else {
-      state = State.running
+      state = State.running;
     }
   }
 
@@ -136,7 +161,7 @@ function keyDownListner(event: KeyboardEvent) {
     for (let player of players) {
       player.positionX = level.startLine;
     }
-    state = State.running
+    state = State.running;
   }
 }
 
@@ -155,6 +180,8 @@ function main() {
   players = Player.createPlayers(context);
   level = new Level(context);
   endScreen = new EndScreen(context);
+
+  menuScreen = new MenuScreen(context);
 
   loop(performance.now());
 }
