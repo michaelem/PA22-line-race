@@ -12,11 +12,7 @@ export default class EndScreen {
     ctx.font = `${30 * drawScale.yScale}px sans-serif`;
     ctx.textAlign = "center";
     ctx.fillStyle = "black";
-    ctx.fillText(
-      text,
-      200 * drawScale.xScale,
-      200 * drawScale.yScale
-    );
+    ctx.fillText(text, 200 * drawScale.xScale, 200 * drawScale.yScale);
 
     ctx.font = `${20 * drawScale.yScale}px sans-serif`;
     ctx.fillText(

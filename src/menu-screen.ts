@@ -45,7 +45,7 @@ export default class MenuScreen {
     return;
   }
 
-  handleKey(key: string): string  {
+  handleKey(key: string): string {
     let index = menu.findIndex((e) => e.key == this.selected);
     let result = "stay";
 

@@ -1,6 +1,5 @@
 import { DrawScale } from "./drawing";
 
-
 export default class Level {
   context: CanvasRenderingContext2D;
   startLine: number = 2400;

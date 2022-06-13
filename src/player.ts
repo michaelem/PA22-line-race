@@ -36,15 +36,29 @@ export default class Player {
 
   static createPlayer(context: CanvasRenderingContext2D) {
     return [
-      new Player("right player", "orange", context, 200, "ArrowUp", "ArrowDown")
-    ]
+      new Player(
+        "right player",
+        "orange",
+        context,
+        200,
+        "ArrowUp",
+        "ArrowDown"
+      ),
+    ];
   }
 
   static createPlayers(context: CanvasRenderingContext2D) {
     return [
-      new Player("right player", "orange", context, 190, "ArrowUp", "ArrowDown"),
+      new Player(
+        "right player",
+        "orange",
+        context,
+        190,
+        "ArrowUp",
+        "ArrowDown"
+      ),
       new Player("left player", "green", context, 210, "KeyW", "KeyS"),
-    ]
+    ];
   }
 
   maxedOutMovement(): boolean {

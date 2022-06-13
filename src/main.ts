@@ -28,7 +28,7 @@ var menuScreen: MenuScreen;
 // system variables
 var canvas: HTMLCanvasElement;
 var context: CanvasRenderingContext2D;
-var last_tick_t = 0;
+var lastTime = 0;
 var width: number;
 var height: number;
 var drawScale: DrawScale;
@@ -93,10 +93,10 @@ function update(dt: number) {
   }
 }
 
-function loop(t_ms: number) {
+function loop(time: number) {
   // calculate dt
-  let dt = t_ms - last_tick_t;
-  last_tick_t = t_ms;
+  let dt = time - lastTime;
+  lastTime = time;
 
   update(dt / 1000); // to seconds
   draw();
