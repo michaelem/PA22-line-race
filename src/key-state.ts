@@ -3,7 +3,6 @@ export default class KeyState {
 
   constructor() {
     this.keymap = new Map<string, boolean>();
-    console.log(this.keymap);
   }
 
   isDown(code: string) {
