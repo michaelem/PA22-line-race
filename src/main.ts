@@ -3,6 +3,8 @@ import Level from "./level";
 import EndScreen from "./end-screen";
 import PauseOverlay from "./pause-overlay";
 import MenuScreen from "./menu-screen";
+import KeyState from "./key-state";
+
 import { DrawScale } from "./drawing";
 
 enum State {
@@ -32,6 +34,7 @@ var lastTime = 0;
 var width: number;
 var height: number;
 var drawScale: DrawScale;
+var keyState: KeyState = new KeyState();
 
 function draw() {
   context.resetTransform();
@@ -72,21 +75,21 @@ function update(dt: number) {
   }
 
   for (let player of players) {
-    player.update(dt);
+    player.update(dt, keyState);
   }
 
   // Center viewport on average player position:
   const averagePosition =
-    players.reduce((total, next) => total + next.positionX, 0) / players.length;
+    players.reduce((total, next) => total + next.position.x, 0) / players.length;
   viewPosition = averagePosition - 200;
 
   for (let player of players) {
-    if (level.collide(player.positionX, player.positionY)) {
+    if (level.collide(player.position.x, player.position.y)) {
       state = State.lost;
       looser = player.name;
     }
 
-    if (level.finish(player.positionX)) {
+    if (level.finish(player.position.x)) {
       state = State.won;
       winner = player.name;
     }
@@ -137,7 +140,7 @@ function startGame(withTutorial = true) {
 
   if (withTutorial == false) {
     for (let player of players) {
-      player.positionX = level.startLine;
+      player.position.x = level.startLine;
     }
   }
 
@@ -146,37 +149,34 @@ function startGame(withTutorial = true) {
 
 function keyDownListner(event: KeyboardEvent) {
   switch (state) {
-    case (State.won, State.lost): {
+    case State.lost:
       if (event.code == "KeyR") {
         startGame(false);
       }
-    }
+      break;
 
-    case State.running: {
+    case State.won:
+      if (event.code == "KeyR") {
+        startGame(false);
+      }
+      break;
+
+    case State.running:
       if (event.code == "Space") {
         state = State.paused;
       }
+      break;
 
-      for (let player of players) {
-        if (event.code == player.upKeyCode) {
-          player.moveUp();
-        }
-        if (event.code == player.downKeyCode) {
-          player.moveDown();
-        }
-      }
-    }
-
-    case State.paused: {
+    case State.paused:
       if (event.code == "Space") {
         state = State.running;
       }
-    }
+      break;
 
-    case State.menu: {
+    case State.menu:
       lastGameMode = menuScreen.handleKey(event.code);
       startGame();
-    }
+      break;
   }
 }
 
@@ -189,6 +189,8 @@ function main() {
 
   context = canvas.getContext("2d")!;
   window.addEventListener("keydown", keyDownListner);
+  window.addEventListener("keydown", (event) => keyState.onKeydown(event));
+  window.addEventListener("keyup", (event) => keyState.onKeyup(event));
   window.addEventListener("resize", resized);
   resized();
 

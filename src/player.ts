@@ -1,16 +1,17 @@
 import { Point, DrawScale } from "./drawing";
+import KeyState from "./key-state";
+
 export default class Player {
   name: string;
-  positionX: number;
-  positionY: number;
-  targetY: number;
-  movementTimer: number;
-  speed: number;
-  context: CanvasRenderingContext2D;
   color: string;
-  trail: Point[];
+  context: CanvasRenderingContext2D;
   upKeyCode: string;
   downKeyCode: string;
+
+  position: Point;
+  speed: number;
+  direction: number;
+  trail: Point[];
 
   constructor(
     name: string,
@@ -21,15 +22,13 @@ export default class Player {
     downKeyCode: string
   ) {
     this.name = name;
-    this.speed = 80;
-    this.positionX = 200;
-    this.positionY = startY;
-    this.targetY = startY;
-    this.movementTimer = 0;
+    this.speed = 100;
+    this.position = { x: 200, y: startY };
     this.context = context;
     this.color = color;
     this.upKeyCode = upKeyCode;
     this.downKeyCode = downKeyCode;
+    this.direction = 0;
 
     this.trail = [{ x: 0, y: startY }];
   }
@@ -61,48 +60,54 @@ export default class Player {
     ];
   }
 
-  maxedOutMovement(): boolean {
-    // return Math.abs(this.targetY - this.positionY) >= 1;
-    return this.movementTimer > 0;
+  private moveUp(dt: number) {
+    const change = -90 * dt;
+    this.direction = Math.max(-30, this.direction + change);
   }
 
-  moveUp() {
-    if (!this.maxedOutMovement()) {
-      this.movementTimer = 0.25;
-      this.targetY = this.targetY - 10;
-    }
+  private moveDown(dt: number) {
+    const change = 90 * dt;
+    this.direction = Math.min(30, this.direction + change);
   }
 
-  moveDown() {
-    if (!this.maxedOutMovement()) {
-      this.movementTimer = 0.25;
-      this.targetY = this.targetY + 10;
-    }
-  }
+  private moveBack(dt: number) {
+    const change = 90 * dt;
 
-  update(dt: number) {
-    this.trail.push({ x: this.positionX, y: this.positionY });
-    let speed: number;
-
-    if (Math.abs(this.targetY - this.positionY) > 0) {
-      speed =
-        (this.speed - 30) *
-        (Math.cos((this.movementTimer / 0.25) * Math.PI) + 1);
-
-      if (this.targetY - this.positionY > 0) {
-        this.positionY = Math.min(this.targetY, this.positionY + speed * dt);
-      } else {
-        this.positionY = Math.max(this.targetY, this.positionY - speed * dt);
-      }
+    if (this.direction >= 0) {
+      this.direction = Math.max(0, this.direction - change);
     } else {
-      speed = this.speed;
+      this.direction = Math.min(0, this.direction + change);
     }
 
-    this.positionX = this.positionX + speed * dt;
+    this.direction;
+  }
 
-    if (this.movementTimer > 0) {
-      this.movementTimer = this.movementTimer - dt;
+  update(dt: number, keyState: KeyState) {
+    this.trail.push(this.position);
+
+    if (keyState.isDown(this.upKeyCode)) {
+      this.moveUp(dt);
+    } else if (keyState.isDown(this.downKeyCode)) {
+      this.moveDown(dt);
+    } else {
+      this.moveBack(dt);
     }
+
+    if (this.direction != 0) {
+      this.speed = 80;
+    } else {
+      this.speed = 100;
+    }
+
+    const distanceTraveled = this.speed * dt;
+    const newX =
+      this.position.x +
+      Math.cos(this.direction * (Math.PI / 180)) * distanceTraveled;
+    const newY =
+      this.position.y +
+      Math.sin(this.direction * (Math.PI / 180)) * distanceTraveled;
+
+    this.position = { x: newX, y: newY };
   }
 
   draw(viewPosition: number, drawScale: DrawScale) {
