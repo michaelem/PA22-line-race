@@ -3,7 +3,7 @@ import Level from "./level";
 import EndScreen from "./end-screen";
 import PauseOverlay from "./pause-overlay";
 import MenuScreen from "./menu-screen";
-import { Point, DrawScale } from "./drawing";
+import { DrawScale } from "./drawing";
 
 enum State {
   "menu",
@@ -120,57 +120,63 @@ function resized() {
   drawScale = { xScale: width / 400, yScale: height / 400 };
 }
 
-function keyDownListner(event: KeyboardEvent) {
-  if (state == State.menu) {
-    lastGameMode = menuScreen.handleKey(event.code);
-    switch (lastGameMode) {
-      case "start-1-p": {
-        players = Player.createPlayer(context);
-        state = State.running;
-        break;
-      }
-      case "start-2-p": {
-        players = Player.createPlayers(context);
-        state = State.running;
-        break;
-      }
+function startGame(withTutorial = true) {
+  switch (lastGameMode) {
+    case "start-1-p": {
+      players = Player.createPlayer(context);
+      break;
     }
-    return;
-  }
-
-  if (event.code == "Space") {
-    if (state == State.running) {
-      state = State.paused;
-    } else {
-      state = State.running;
+    case "start-2-p": {
+      players = Player.createPlayers(context);
+      break;
+    }
+    default: {
+      return;
     }
   }
 
-  for (let player of players) {
-    if (event.code == player.upKeyCode) {
-      player.moveUp();
-    }
-    if (event.code == player.downKeyCode) {
-      player.moveDown();
-    }
-  }
-
-  if (event.code == "KeyR" && (state == State.won || state == State.lost)) {
-    switch (lastGameMode) {
-      case "start-1-p": {
-        players = Player.createPlayer(context);
-        break;
-      }
-      case "start-2-p": {
-        players = Player.createPlayers(context);
-        break;
-      }
-    }
-
+  if (withTutorial == false) {
     for (let player of players) {
       player.positionX = level.startLine;
     }
-    state = State.running;
+  }
+
+  state = State.running;
+}
+
+function keyDownListner(event: KeyboardEvent) {
+  switch (state) {
+    case (State.won, State.lost): {
+      if (event.code == "KeyR") {
+        startGame(false);
+      }
+    }
+
+    case State.running: {
+      if (event.code == "Space") {
+        state = State.paused;
+      }
+
+      for (let player of players) {
+        if (event.code == player.upKeyCode) {
+          player.moveUp();
+        }
+        if (event.code == player.downKeyCode) {
+          player.moveDown();
+        }
+      }
+    }
+
+    case State.paused: {
+      if (event.code == "Space") {
+        state = State.running;
+      }
+    }
+
+    case State.menu: {
+      lastGameMode = menuScreen.handleKey(event.code);
+      startGame();
+    }
   }
 }
 
