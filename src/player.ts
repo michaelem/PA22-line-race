@@ -21,7 +21,7 @@ export default class Player {
     downKeyCode: string
   ) {
     this.name = name;
-    this.speed = 50;
+    this.speed = 80;
     this.positionX = 200;
     this.positionY = startY;
     this.targetY = startY;
@@ -82,7 +82,6 @@ export default class Player {
 
   update(dt: number) {
     this.trail.push({ x: this.positionX, y: this.positionY });
-    this.positionX = this.positionX + this.speed * dt;
     let speed: number;
 
     if (Math.abs(this.targetY - this.positionY) > 0) {
