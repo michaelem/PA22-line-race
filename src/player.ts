@@ -2,6 +2,9 @@ import { Point, DrawScale } from "./drawing";
 import KeyState from "./key-state";
 
 export default class Player {
+  private static readonly maxAngle = 30;
+  private static readonly angleChangeSpeed = 90;
+
   name: string;
   color: string;
   context: CanvasRenderingContext2D;
@@ -60,28 +63,6 @@ export default class Player {
     ];
   }
 
-  private moveUp(dt: number) {
-    const change = -90 * dt;
-    this.direction = Math.max(-30, this.direction + change);
-  }
-
-  private moveDown(dt: number) {
-    const change = 90 * dt;
-    this.direction = Math.min(30, this.direction + change);
-  }
-
-  private moveBack(dt: number) {
-    const change = 90 * dt;
-
-    if (this.direction >= 0) {
-      this.direction = Math.max(0, this.direction - change);
-    } else {
-      this.direction = Math.min(0, this.direction + change);
-    }
-
-    this.direction;
-  }
-
   update(dt: number, keyState: KeyState) {
     this.trail.push(this.position);
 
@@ -117,7 +98,7 @@ export default class Player {
     this.drawTrail(viewPosition, drawScale);
   }
 
-  drawTrail(viewPosition: number, drawScale: DrawScale) {
+  private drawTrail(viewPosition: number, drawScale: DrawScale) {
     this.cutTrail(viewPosition);
 
     const ctx = this.context;
@@ -140,7 +121,29 @@ export default class Player {
     ctx.stroke();
   }
 
-  cutTrail(viewPosition: number) {
+  private cutTrail(viewPosition: number) {
     this.trail = this.trail.filter((point) => point.x >= viewPosition - 200);
+  }
+
+  private moveUp(dt: number) {
+    const change = -Player.angleChangeSpeed * dt;
+    this.direction = Math.max(-Player.maxAngle, this.direction + change);
+  }
+
+  private moveDown(dt: number) {
+    const change = Player.angleChangeSpeed * dt;
+    this.direction = Math.min(Player.maxAngle, this.direction + change);
+  }
+
+  private moveBack(dt: number) {
+    const change = Player.angleChangeSpeed * dt;
+
+    if (this.direction >= 0) {
+      this.direction = Math.max(0, this.direction - change);
+    } else {
+      this.direction = Math.min(0, this.direction + change);
+    }
+
+    this.direction;
   }
 }
