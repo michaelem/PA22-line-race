@@ -9,12 +9,13 @@ export default class EndScreen {
     ctx.fillStyle = fillStyle;
     ctx.fillRect(0, 0, 400 * drawScale.xScale, 400 * drawScale.yScale);
 
-    ctx.font = `${30 * drawScale.yScale}px sans-serif`;
+    ctx.font = `${30*drawScale.yScale}px KdamThmorPro-Regular`;
+
     ctx.textAlign = "center";
     ctx.fillStyle = "black";
     ctx.fillText(text, 200 * drawScale.xScale, 200 * drawScale.yScale);
 
-    ctx.font = `${20 * drawScale.yScale}px sans-serif`;
+    ctx.font = `${20 * drawScale.yScale}px KdamThmorPro-Regular`;
     ctx.fillText(
       "press 'r' to restart",
       200 * drawScale.xScale,

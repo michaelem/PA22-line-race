@@ -1,4 +1,4 @@
-import { DrawScale } from "./drawing";
+import { DrawScale, Point } from "./drawing";
 
 export default class Level {
   context: CanvasRenderingContext2D;
@@ -52,6 +52,14 @@ export default class Level {
     this.context = context;
   }
 
+  crossedStartLine(position: Point): boolean {
+    return position.x > this.startLine
+  }
+
+  crossedFinishLine(position: Point): boolean {
+    return position.x >= this.end;
+  }
+
   collide(x: number, y: number): boolean {
     for (let square of this.squares) {
       const squareX = square.x - square.size / 2;
@@ -65,10 +73,6 @@ export default class Level {
       }
     }
     return false;
-  }
-
-  finish(x: number) {
-    return x >= this.end;
   }
 
   draw(viewPosition: number, drawScale: DrawScale) {
@@ -87,7 +91,7 @@ export default class Level {
     }
 
     if (viewPosition < 2500) {
-      ctx.font = `${30 * drawScale.yScale}px sans-serif`;
+      ctx.font = `${30*drawScale.yScale}px KdamThmorPro-Regular`;
       ctx.textAlign = "left";
 
       ctx.fillStyle = "green";

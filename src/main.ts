@@ -26,6 +26,7 @@ var looser: string;
 var winner: string;
 var endScreen: EndScreen;
 var menuScreen: MenuScreen;
+var timer: number;
 
 // system variables
 var canvas: HTMLCanvasElement;
@@ -63,6 +64,11 @@ function draw() {
     player.draw(viewPosition, drawScale);
   }
 
+  context.fillStyle = "rgba(128, 20, 20, 0.7)";;
+  context.textAlign = "right";
+  context.font = `${30*drawScale.yScale}px RobotMono-Regular`;
+  const timerText = String(timer.toFixed(2)).split('.')
+  context.fillText(`${timerText[0]}:${timerText[1]}`, (390 * drawScale.xScale), (30 * drawScale.yScale))
   if (state == State.paused) {
     const overlay = new PauseOverlay(context);
     overlay.draw(drawScale);
@@ -89,7 +95,12 @@ function update(dt: number) {
       looser = player.name;
     }
 
-    if (level.finish(player.position.x)) {
+    if (level.crossedStartLine(player.position) && !level.crossedFinishLine(player.position)) {
+      timer = timer + dt;
+    } 
+
+
+    if (level.crossedFinishLine(player.position)) {
       state = State.won;
       winner = player.name;
     }
@@ -124,6 +135,7 @@ function resized() {
 }
 
 function startGame(withTutorial = true) {
+  timer = 0;
   switch (lastGameMode) {
     case "start-1-p": {
       players = Player.createPlayer(context);

@@ -24,7 +24,8 @@ export default class MenuScreen {
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, 400 * drawScale.xScale, 400 * drawScale.yScale);
 
-    ctx.font = `${spacing * drawScale.yScale}px sans-serif`;
+    ctx.font = `${spacing * drawScale.yScale}px KdamThmorPro-Regular`;
+    
     ctx.textAlign = "left";
 
     const start = 200 - (menu.length * spacing) / 2;
