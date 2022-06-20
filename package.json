@@ -4,13 +4,16 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "build": "tsc --noEmit & esbuild src/main.ts --bundle --sourcemap --minify --outfile=build/main.js && cp -r src/index.html build && python3 -m http.server -d build",
-    "production": "tsc --noEmit && esbuild src/main.ts --bundle --minify --outfile=build/main.js && cp -r src/index.html build"
+    "build": "cp -r src/index.html build & esbuild src/main.ts --bundle --sourcemap --minify --outfile=build/main.js",
+    "dev": "cp -r src/index.html build & esbuild src/main.ts --bundle --sourcemap --minify --watch --outfile=build/main.js & http-server build -c-1",
+    "clean": "rm -r build/*",
+    "production": "cp -r src/index.html docs && esbuild src/main.ts --bundle --sourcemap --minify --outfile=docs/main.js"
   },
   "author": "Michael Emhofer",
   "license": "UNLICENSED",
   "devDependencies": {
-    "esbuild": "^0.14.25",
+    "esbuild": "^0.14.46",
+    "http-server": "^14.1.1",
     "typescript": "^4.6.4"
   }
 }
