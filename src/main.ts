@@ -215,4 +215,8 @@ function main() {
   loop(performance.now());
 }
 
-main();
+document.onreadystatechange = () => {
+  if (document.readyState === 'interactive') {
+    main();
+  }
+}
